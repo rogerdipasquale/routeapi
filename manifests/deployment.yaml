@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: routeapi
+  namespace: default
+  labels:
+    app: routeapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: routeapi
+  template:
+    metadata:
+      labels:
+        app: routeapi
+    spec:
+      serviceAccountName: routeapi
+      containers:
+      - name: routeapi
+        image: routeapi:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: routeapi
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: routeapi
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
