@@ -1,0 +1,1 @@
+{"routes":[{"name":"weight-route","namespace":"traefik","hostnames":[],"parentRefs":[{"name":"weight-gateway","namespace":"traefik"}],"rules":[{"backendRefs":[{"serviceName":"whoami","servicePort":80,"weight":1},{"serviceName":"whoami-api","servicePort":80,"weight":3}]}]}]}

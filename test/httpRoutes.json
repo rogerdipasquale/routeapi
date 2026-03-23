@@ -1,0 +1,128 @@
+{
+  "apiVersion": "gateway.networking.k8s.io/v1",
+  "items": [
+    {
+      "apiVersion": "gateway.networking.k8s.io/v1",
+      "kind": "HTTPRoute",
+      "metadata": {
+        "annotations": {
+          "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"gateway.networking.k8s.io/v1\",\"kind\":\"HTTPRoute\",\"metadata\":{\"annotations\":{},\"name\":\"weight-route\",\"namespace\":\"traefik\"},\"spec\":{\"parentRefs\":[{\"name\":\"weight-gateway\"}],\"rules\":[{\"backendRefs\":[{\"name\":\"whoami\",\"port\":80,\"weight\":1},{\"name\":\"whoami-api\",\"port\":80,\"weight\":3}],\"matches\":[{\"path\":{\"type\":\"PathPrefix\",\"value\":\"/standard\"}}]}]}}\n"
+        },
+        "creationTimestamp": "2026-03-22T21:34:47Z",
+        "generation": 1,
+        "managedFields": [
+          {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:kubectl.kubernetes.io/last-applied-configuration": {}
+                }
+              },
+              "f:spec": {
+                ".": {},
+                "f:parentRefs": {},
+                "f:rules": {}
+              }
+            },
+            "manager": "kubectl-client-side-apply",
+            "operation": "Update",
+            "time": "2026-03-22T21:34:47Z"
+          },
+          {
+            "apiVersion": "gateway.networking.k8s.io/v1",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:status": {
+                ".": {},
+                "f:parents": {}
+              }
+            },
+            "manager": "traefik",
+            "operation": "Update",
+            "subresource": "status",
+            "time": "2026-03-22T21:34:47Z"
+          }
+        ],
+        "name": "weight-route",
+        "namespace": "traefik",
+        "resourceVersion": "165644",
+        "uid": "b58d802a-e9a1-43db-8da6-8526acbef5b1"
+      },
+      "spec": {
+        "parentRefs": [
+          {
+            "group": "gateway.networking.k8s.io",
+            "kind": "Gateway",
+            "name": "weight-gateway"
+          }
+        ],
+        "rules": [
+          {
+            "backendRefs": [
+              {
+                "group": "",
+                "kind": "Service",
+                "name": "whoami",
+                "port": 80,
+                "weight": 1
+              },
+              {
+                "group": "",
+                "kind": "Service",
+                "name": "whoami-api",
+                "port": 80,
+                "weight": 3
+              }
+            ],
+            "matches": [
+              {
+                "path": {
+                  "type": "PathPrefix",
+                  "value": "/standard"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "status": {
+        "parents": [
+          {
+            "conditions": [
+              {
+                "lastTransitionTime": "2026-03-22T21:34:47Z",
+                "message": "",
+                "observedGeneration": 1,
+                "reason": "Accepted",
+                "status": "True",
+                "type": "Accepted"
+              },
+              {
+                "lastTransitionTime": "2026-03-22T21:34:47Z",
+                "message": "Cannot load HTTPBackendRef traefik/whoami: getting service: service \"whoami\" not found",
+                "observedGeneration": 1,
+                "reason": "BackendNotFound",
+                "status": "False",
+                "type": "ResolvedRefs"
+              }
+            ],
+            "controllerName": "traefik.io/gateway-controller",
+            "parentRef": {
+              "group": "gateway.networking.k8s.io",
+              "kind": "Gateway",
+              "name": "weight-gateway"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "kind": "HTTPRouteList",
+  "metadata": {
+    "continue": "",
+    "resourceVersion": "173522"
+  }
+}

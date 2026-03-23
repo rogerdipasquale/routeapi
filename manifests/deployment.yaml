@@ -18,7 +18,7 @@ spec:
       serviceAccountName: routeapi
       containers:
       - name: routeapi
-        image: routeapi:latest
+        image: ghcr.io/rogerdipasquale/routeapi:main
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
