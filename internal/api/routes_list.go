@@ -19,7 +19,7 @@ func HandleListRoutes(k8sClient *k8s.Client) http.HandlerFunc {
 		}
 
 		if (queriesDeployment == "true") {
-			routes, err := k8sClient.FillRoutesWithDeployments(req.Context(), routes)
+			err = k8sClient.FillRoutesWithDeployments(req.Context(), routes)
 		}
 
 		w.WriteHeader(http.StatusOK)

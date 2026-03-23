@@ -39,8 +39,8 @@ type BackendRefInfo struct {
 	ServiceName string `json:"serviceName"`
 	ServicePort int32  `json:"servicePort"`
 	Weight      *int32 `json:"weight,omitempty"`
-	//Service ServiceInfo `json:"serviceInfo,omitempty"`
-	//Deployment	[]DeploymentInfo `json:"deploymentInfo,omitempty"`
+	Service ServiceInfo `json:"serviceInfo,omitempty"`
+	Deployments	[]DeploymentInfo `json:"deploymentInfo,omitempty"`
 }
 
 type ServiceInfo struct {
@@ -366,10 +366,30 @@ func toRouteInfo(route *HTTPRoute) *RouteInfo {
 }
 
 
-func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes HTTPRouteList) (HTTPRouteList, error) {
-	//def namespace String
-	namespace := ""
+func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteInfo) (error) {
+	var namespace string
+	
+	for _, route := range routes {
+		for _, rule := range route.Rules {
+			for _, backendRef := range rule.BackendRefs {
+				namespace = route.Namespace
+				fmt.Printf("setvice %s", backendRef.ServiceName)
 
+				svc, err := c.GetService(ctx, backendRef.ServiceName, namespace)
+				if err != nil {
+					return err
+				}
+				deployment, err := c.GetDeploymentBySelector(ctx, namespace, svc.Selector)
+				if err != nil {
+					return  err
+				}
+				
+				backendRef.Deployments[0] = *deployment
+
+			}
+		}
+	}
+/*
 	for _, httpRoute := range routes.Items {
 		for _, rule := range httpRoute.Spec.Rules {
 			for _, backend := range rule.BackendRefs {
@@ -384,17 +404,16 @@ func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes HTTPRoute
 				
 				svc, err := c.GetService(ctx, backend.Name, namespace)
 				if err != nil {
-					return routes, err
+					return err
 				}
 				deployment, err := c.GetDeploymentBySelector(ctx, namespace, svc.Selector)
 				if err != nil {
-					return routes, err
+					return  err
 				}
-				backend.Deployment = deployment.Name
-				backend.Image = deployment.Image
+				backend.Deployments[0] = toDeploymentInfo(deployment)
 			}
 		}
 	}
-
-	return routes, nil	
+*/
+	return nil	
 }
