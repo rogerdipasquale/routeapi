@@ -117,10 +117,10 @@ func (c *Client) GetDeploymentBySelector(ctx context.Context, namespace string, 
 	for k, v := range selector {
 		selParts = append(selParts, fmt.Sprintf("%s=%s", k, v))
 	}
-	selectorLabel := strings.Join(selParts, ",")
+	labelSelector := strings.Join(selParts, ",")
 
-	url := fmt.Sprintf("%s/apis/apps/v1/namespaces/%s/deployments?SelectorLabel=%s",
-		c.baseURL, namespace, selectorLabel)
+	url := fmt.Sprintf("%s/apis/apps/v1/namespaces/%s/deployments?labelSelector=%s",
+		c.baseURL, namespace, labelSelector)
 
 	slog.Info("::GetDeploymentBySelector:: querying", "url", url)
 	data, statusCode, err := c.doRequest(http.MethodGet, url, nil)
