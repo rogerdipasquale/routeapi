@@ -404,8 +404,8 @@ func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteIn
 					return  err
 				}
 				slog.Info("::FillRoutesWithDeployments::", "deployment", deployment.Image)
-				currentBackend.Deployments[0] = *deployment
-
+				
+				currentBackend.Deployments = append(currentBackend.Deployments, *deployment)
 			}
 		}
 	}
