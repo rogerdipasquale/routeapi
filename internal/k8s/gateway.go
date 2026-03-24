@@ -371,14 +371,20 @@ func toRouteInfo(route *HTTPRoute) *RouteInfo {
 func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteInfo) (error) {
 	var namespace string
 	
-	for _, route := range routes {
-		slog.Info("::FillRoutesWithDeployments::", "route", route.Name)
-		for _, rule := range route.Rules {
-			for _, backendRef := range rule.BackendRefs {
-				namespace = route.Namespace
-				fmt.Printf("setvice %s", backendRef.ServiceName)
+	for routeIndex := range routes {
+		slog.Info("::FillRoutesWithDeployments::", "route", routes[routeIndex].Name)
+		for ruleIndex := range routes[routeIndex].Rules {
+			for backendIndex := range routes[routeIndex].Rules[ruleIndex].BackendRefs {
 
-				svc, err := c.GetService(ctx, backendRef.ServiceName, namespace)
+				currentRoute := &routes[routeIndex]
+                currentBackend := &routes[routeIndex].Rules[ruleIndex].BackendRefs[backendIndex]
+
+				namespace = currentRoute.Namespace
+				fmt.Printf("setvice %s", currentBackend.ServiceName)
+
+
+
+				svc, err := c.GetService(ctx, currentBackend.ServiceName, namespace)
 				if err != nil {
 					return err
 				}
@@ -387,7 +393,7 @@ func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteIn
 					return  err
 				}
 				
-				backendRef.Deployments[0] = *deployment
+				currentBackend.Deployments[0] = *deployment
 
 			}
 		}
