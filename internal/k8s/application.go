@@ -6,6 +6,7 @@ import (
 //	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 //	"io"
 	"net/http"
 //	"os"
@@ -121,6 +122,7 @@ func (c *Client) GetDeploymentBySelector(ctx context.Context, namespace string, 
 	url := fmt.Sprintf("%s/apis/apps/v1/namespaces/%s/deployments?labelSelector=%s",
 		c.baseURL, namespace, labelSelector)
 
+	slog.Info("::GetDeploymentBySelector:: querying", "url", url)
 	data, statusCode, err := c.doRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -129,7 +131,7 @@ func (c *Client) GetDeploymentBySelector(ctx context.Context, namespace string, 
 	if statusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d, body: %s", statusCode, string(data))
 	}
-
+	slog.Info("::GetDeploymentBySelector::", "response", data)
 	var deployList DeploymentList
 	if err := json.Unmarshal(data, &deployList); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal DeploymentList: %w", err)

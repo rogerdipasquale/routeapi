@@ -37,6 +37,7 @@ type RouteRuleInfo struct {
 }
 
 type BackendRefInfo struct {
+	Namespace string `json:"namespace"`
 	ServiceName string `json:"serviceName"`
 	ServicePort int32  `json:"servicePort"`
 	Weight      *int32 `json:"weight,omitempty"`
@@ -348,8 +349,11 @@ func toRouteInfo(route *HTTPRoute) *RouteInfo {
 			ns := route.Metadata.Namespace
 			if ref.Namespace != nil {
 				ns = *ref.Namespace
-			}
+			} else{
+				ns = "default"
+			} 
 			rule.BackendRefs[j] = BackendRefInfo{
+				Namespace: ns,
 				ServiceName: ref.Name,
 				ServicePort: func() int32 {
 					if ref.Port != nil {
@@ -376,25 +380,32 @@ func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteIn
 		for ruleIndex := range routes[routeIndex].Rules {
 			for backendIndex := range routes[routeIndex].Rules[ruleIndex].BackendRefs {
 
-				currentRoute := &routes[routeIndex]
+				//currentRoute := &routes[routeIndex]
                 currentBackend := &routes[routeIndex].Rules[ruleIndex].BackendRefs[backendIndex]
 
-				namespace = currentRoute.Namespace
-				fmt.Printf("setvice %s", currentBackend.ServiceName)
+				if (currentBackend.Namespace != "") {
+					namespace=currentBackend.Namespace
+				}else {
+					namespace="default"
+				}
+				
 
-
-
+				slog.Info("::FillRoutesWithDeployment:: Looking for service", "service", currentBackend.ServiceName, "namespace", namespace)
 				svc, err := c.GetService(ctx, currentBackend.ServiceName, namespace)
 				if err != nil {
+					slog.Error("::FillRoutesWithDeployment:: GetService", "ERROR", err)
 					return err
 				}
+				slog.Info("::FillRoutesWithDeployment:: Looking for deployment", "selector", svc.Selector, "namespace", namespace)
+
 				deployment, err := c.GetDeploymentBySelector(ctx, namespace, svc.Selector)
 				if err != nil {
+					slog.Error("::FillRoutesWithDeployment:: GetDeploymentBySelector", "ERROR", err)
 					return  err
 				}
 				slog.Info("::FillRoutesWithDeployments::", "deployment", deployment.Image)
-				currentBackend.Deployments[0] = *deployment
-
+				
+				currentBackend.Deployments = append(currentBackend.Deployments, *deployment)
 			}
 		}
 	}
