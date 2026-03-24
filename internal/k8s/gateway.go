@@ -37,6 +37,7 @@ type RouteRuleInfo struct {
 }
 
 type BackendRefInfo struct {
+	Namespace string `json:"namespace"`
 	ServiceName string `json:"serviceName"`
 	ServicePort int32  `json:"servicePort"`
 	Weight      *int32 `json:"weight,omitempty"`
@@ -348,8 +349,11 @@ func toRouteInfo(route *HTTPRoute) *RouteInfo {
 			ns := route.Metadata.Namespace
 			if ref.Namespace != nil {
 				ns = *ref.Namespace
-			}
+			} else{
+				ns = "default"
+			} 
 			rule.BackendRefs[j] = BackendRefInfo{
+				Namespace: ns,
 				ServiceName: ref.Name,
 				ServicePort: func() int32 {
 					if ref.Port != nil {
@@ -376,10 +380,15 @@ func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteIn
 		for ruleIndex := range routes[routeIndex].Rules {
 			for backendIndex := range routes[routeIndex].Rules[ruleIndex].BackendRefs {
 
-				currentRoute := &routes[routeIndex]
+				//currentRoute := &routes[routeIndex]
                 currentBackend := &routes[routeIndex].Rules[ruleIndex].BackendRefs[backendIndex]
 
-				namespace = currentRoute.Namespace
+				if (currentBackend.Namespace != "") {
+					namespace=currentBackend.Namespace
+				}else {
+					namespace="default"
+				}
+				
 				fmt.Printf("setvice %s", currentBackend.ServiceName)
 
 
