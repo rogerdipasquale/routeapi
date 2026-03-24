@@ -386,10 +386,12 @@ func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteIn
 
 				svc, err := c.GetService(ctx, currentBackend.ServiceName, namespace)
 				if err != nil {
+					slog.Error("::FillRoutesWithDeployment:: GetService", "ERROR", err)
 					return err
 				}
 				deployment, err := c.GetDeploymentBySelector(ctx, namespace, svc.Selector)
 				if err != nil {
+					slog.Error("::FillRoutesWithDeployment:: GetDeploymentBySelector", "ERROR", err)
 					return  err
 				}
 				slog.Info("::FillRoutesWithDeployments::", "deployment", deployment.Image)
