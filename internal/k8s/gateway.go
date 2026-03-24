@@ -389,15 +389,15 @@ func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteIn
 					namespace="default"
 				}
 				
-				fmt.Printf("setvice %s", currentBackend.ServiceName)
 
-
-
+				slog.Info("::FillRoutesWithDeployment:: Looking for service", "service", currentBackend.ServiceName, "namespace", namespace)
 				svc, err := c.GetService(ctx, currentBackend.ServiceName, namespace)
 				if err != nil {
 					slog.Error("::FillRoutesWithDeployment:: GetService", "ERROR", err)
 					return err
 				}
+				slog.Info("::FillRoutesWithDeployment:: Looking for deployment", "selector", svc.Selector, "namespace", namespace)
+
 				deployment, err := c.GetDeploymentBySelector(ctx, namespace, svc.Selector)
 				if err != nil {
 					slog.Error("::FillRoutesWithDeployment:: GetDeploymentBySelector", "ERROR", err)
