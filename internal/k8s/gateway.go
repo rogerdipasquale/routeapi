@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"strings"
@@ -277,6 +278,7 @@ func (c *Client) ListHTTPRoutes(ctx context.Context, namespace string) ([]RouteI
 		return nil, fmt.Errorf("failed to unmarshal HTTPRouteList: %w", err)
 	}
 
+	slog.Info("::ListHTTPRoutes", "routeList.Items length",  len(routeList.Items))
 	result := make([]RouteInfo, len(routeList.Items))
 	for i, r := range routeList.Items {
 		result[i] = *toRouteInfo(&r)
@@ -370,6 +372,7 @@ func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteIn
 	var namespace string
 	
 	for _, route := range routes {
+		slog.Info("::FillRoutesWithDeployments::", "route", route.Name)
 		for _, rule := range route.Rules {
 			for _, backendRef := range rule.BackendRefs {
 				namespace = route.Namespace

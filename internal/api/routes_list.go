@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-
+	"log/slog"
 	"routeapi/internal/k8s"
 )
 
@@ -15,10 +15,13 @@ func HandleListRoutes(k8sClient *k8s.Client) http.HandlerFunc {
 		routes, err := k8sClient.ListHTTPRoutes(req.Context(), namespace)
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
+			slog.Error("Internal server error","ERROR", err)
 			return
 		}
 
+		slog.Info("::HandleListRoutes:: queryesDeployment", "queriesDeployment", queriesDeployment)
 		if (queriesDeployment == "true") {
+			
 			err = k8sClient.FillRoutesWithDeployments(req.Context(), routes)
 		}
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,7 +20,8 @@ func main() {
 
 	k8sClient, err := k8s.NewClient()
 	if err != nil {
-		log.Fatalf("Failed to create k8s client: %v", err)
+		slog.Error("Failed to create k8s client","ERROR", err)
+		return 
 	}
 
 	router := api.NewRouter(k8sClient)
@@ -38,12 +39,14 @@ func main() {
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer shutdownCancel()
 		if err := srv.Shutdown(shutdownCtx); err != nil {
-			log.Printf("Server shutdown error: %v", err)
+			slog.Error("Server shutdown error:", "ERROR", err)
+			return 
 		}
 	}()
 
-	log.Println("Starting server on :8080")
+	slog.Info("Starting server on :8080")
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
-		log.Fatalf("Server error: %v", err)
+		slog.Error("Server error:","ERROR", err)
+		return 
 	}
 }
