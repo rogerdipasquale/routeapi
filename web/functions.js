@@ -1,5 +1,5 @@
 //const API_BASE = window.API_BASE || '/routes';
-const API_BASE = "http://127.0.0.1:8080/routes"
+const API_BASE = "/api/routes"
 async function loadData() {
     const namespace = document.getElementById('namespace').value.trim();
     const errorEl = document.getElementById('error');
