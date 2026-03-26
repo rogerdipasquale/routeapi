@@ -24,13 +24,24 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		HandleListRoutes(r.k8s)(w, req)
 	case req.Method == http.MethodGet && req.URL.Path == "/api/getRoute":
 		HandleGetRoute(r.k8s)(w, req)
+
 	/* Serving web site */ 
 	case req.Method == http.MethodGet && req.URL.Path == "/":
+		w.Header().Set("Content-type", "text/html")
 		http.ServeFile(w, req, filepath.Join("web", "index.html"))
 	case req.Method == http.MethodGet:
 		if filepath.Ext(req.URL.Path) == "" {
+			w.Header().Set("Content-type", "text/html")
 			http.ServeFile(w, req, filepath.Join("web", "index.html"))
 		} else {
+			filetype := "html"
+			switch {
+			case filepath.Ext(req.URL.Path) == "js":
+					filetype = "javascript"
+			case filepath.Ext(req.URL.Path) == "css":
+					filetype = "css"
+			}
+			w.Header().Set("Content-type", "text/" + filetype)			
 			http.ServeFile(w, req, filepath.Join("web", req.URL.Path))
 		}
 	default:
