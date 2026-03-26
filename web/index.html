@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Routes & Deployments</title>
+    
+    <link rel="stylesheet" href="styles.css">
+    <script src="./functions.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Routes & Deployments</h1>
+            <p class="subtitle">View Kubernetes HTTPRoutes and their associated deployments</p>
+        </header>
+
+        <div class="controls">
+            <input type="text" id="namespace" placeholder="Namespace (default: default)">
+            <button id="loadBtn" onclick="loadData()">Load Routes</button>
+            <button id="refreshBtn" onclick="loadData()" style="display: none;">
+                <span id="refreshText">Refresh</span>
+            </button>
+        </div>
+
+        <div id="error" class="error" style="display: none;"></div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <span>Loading routes...</span>
+        </div>
+
+        <div id="content" class="card">
+            <div class="empty-state">
+                Click "Load Routes" to fetch data from the API
+            </div>
+        </div>
+    </div>
+</body>
+</html>
