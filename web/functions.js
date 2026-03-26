@@ -80,7 +80,7 @@ function renderTable(routes) {
                     return `<span class="tag">${escapeHtml(be.serviceName)}${port}</span>`;
                 }).join('<br>');
 
-                const allDeployments = allBackends.flatMap(be => be.deployments || []);
+                const allDeployments = allBackends.flatMap(be => be.deploymentInfo || []);
                 
                 if (allDeployments.length > 0) {
                     deploymentsHtml = `
