@@ -16,6 +16,7 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /opt/app
 
 COPY --from=builder /app/routeapi .
+COPY web/ ./web/
 
 EXPOSE 8080
 
