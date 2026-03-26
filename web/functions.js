@@ -77,7 +77,7 @@ function renderTable(routes) {
             if (allBackends.length > 0) {
                 servicesHtml = allBackends.map(be => {
                     const port = be.servicePort ? `:${be.servicePort}` : '';
-                    return `<span class="tag">${escapeHtml(be.serviceName)}${port}</span>`;
+                    return `<span class="tag">${escapeHtml(be.serviceName)}${port} - weight: ${be.weight}</span>`;
                 }).join('<br>');
 
                 const allDeployments = allBackends.flatMap(be => be.deploymentInfo || []);
