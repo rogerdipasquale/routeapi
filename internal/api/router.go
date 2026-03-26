@@ -2,8 +2,10 @@ package api
 
 import (
 	"net/http"
+	"log/slog"
 	"path/filepath"
 	"routeapi/internal/k8s"
+	"strings"
 )
 
 type Router struct {
@@ -34,13 +36,16 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			w.Header().Set("Content-type", "text/html")
 			http.ServeFile(w, req, filepath.Join("web", "index.html"))
 		} else {
+			_, fileExtension, _ :=strings.Cut(req.URL.Path, ".")
+			slog.Info("static filie extension", "extension", "fileExtension")
 			filetype := "html"
 			switch {
-			case filepath.Ext(req.URL.Path) == "js":
+			case fileExtension == "js":
 					filetype = "javascript"
-			case filepath.Ext(req.URL.Path) == "css":
+			case fileExtension == "css":
 					filetype = "css"
 			}
+			slog.Info("content type", "value", filetype)
 			w.Header().Set("Content-type", "text/" + filetype)			
 			http.ServeFile(w, req, filepath.Join("web", req.URL.Path))
 		}
