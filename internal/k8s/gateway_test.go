@@ -1,10 +1,10 @@
 package k8s
 
 import (
-	"testing"
-	"os"
-	"fmt"
 	"encoding/json"
+	"fmt"
+	"os"
+	"testing"
 )
 
 func testFillRouteWithDeployment(t *testing.T) {
@@ -14,18 +14,16 @@ func testFillRouteWithDeployment(t *testing.T) {
 
 	json.Unmarshal(data, &routeList)
 
-
 	for _, httpRoute := range routeList.Items {
 		for _, rule := range httpRoute.Spec.Rules {
 			for _, backend := range rule.BackendRefs {
 				fmt.Printf("%s service \n", backend.Name)
-				if (*backend.Kind != "Service") {
+				if *backend.Kind != "Service" {
 					t.Errorf("test found a backend with kind different than 'Service': %s-%s", *backend.Kind, backend.Name)
 				}
 			}
 		}
-	}	
-
+	}
 
 	routeInfoArr := make([]RouteInfo, len(routeList.Items))
 	for i, r := range routeList.Items {
@@ -39,6 +37,5 @@ func testFillRouteWithDeployment(t *testing.T) {
 			}
 		}
 	}
-
 
 }

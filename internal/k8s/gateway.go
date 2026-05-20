@@ -37,12 +37,12 @@ type RouteRuleInfo struct {
 }
 
 type BackendRefInfo struct {
-	Namespace string `json:"namespace"`
-	ServiceName string `json:"serviceName"`
-	ServicePort int32  `json:"servicePort"`
-	Weight      *int32 `json:"weight,omitempty"`
-	Service ServiceInfo `json:"serviceInfo,omitempty"`
-	Deployments	[]DeploymentInfo `json:"deploymentInfo,omitempty"`
+	Namespace   string           `json:"namespace"`
+	ServiceName string           `json:"serviceName"`
+	ServicePort int32            `json:"servicePort"`
+	Weight      *int32           `json:"weight,omitempty"`
+	Service     ServiceInfo      `json:"serviceInfo,omitempty"`
+	Deployments []DeploymentInfo `json:"deploymentInfo,omitempty"`
 }
 
 type ServiceInfo struct {
@@ -211,12 +211,12 @@ type BackendRef struct {
 }
 
 type BackendObjectReference struct {
-	Group     *string `json:"group,omitempty"`
-	Kind      *string `json:"kind,omitempty"`
-	Name      string  `json:"name"`
-	Namespace *string `json:"namespace,omitempty"`
-	Port      *int32  `json:"port,omitempty"`
-	Deployment      string  `json:"deployment,omitempty"`
+	Group      *string `json:"group,omitempty"`
+	Kind       *string `json:"kind,omitempty"`
+	Name       string  `json:"name"`
+	Namespace  *string `json:"namespace,omitempty"`
+	Port       *int32  `json:"port,omitempty"`
+	Deployment string  `json:"deployment,omitempty"`
 	Image      string  `json:"image,omitempty"`
 }
 
@@ -279,7 +279,7 @@ func (c *Client) ListHTTPRoutes(ctx context.Context, namespace string) ([]RouteI
 		return nil, fmt.Errorf("failed to unmarshal HTTPRouteList: %w", err)
 	}
 
-	slog.Info("::ListHTTPRoutes", "routeList.Items length",  len(routeList.Items))
+	slog.Info("::ListHTTPRoutes", "routeList.Items length", len(routeList.Items))
 	result := make([]RouteInfo, len(routeList.Items))
 	for i, r := range routeList.Items {
 		result[i] = *toRouteInfo(&r)
@@ -349,11 +349,11 @@ func toRouteInfo(route *HTTPRoute) *RouteInfo {
 			ns := route.Metadata.Namespace
 			if ref.Namespace != nil {
 				ns = *ref.Namespace
-			} else{
+			} else {
 				ns = "default"
-			} 
+			}
 			rule.BackendRefs[j] = BackendRefInfo{
-				Namespace: ns,
+				Namespace:   ns,
 				ServiceName: ref.Name,
 				ServicePort: func() int32 {
 					if ref.Port != nil {
@@ -371,24 +371,22 @@ func toRouteInfo(route *HTTPRoute) *RouteInfo {
 	return info
 }
 
-
-func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteInfo) (error) {
+func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteInfo) error {
 	var namespace string
-	
+
 	for routeIndex := range routes {
 		slog.Info("::FillRoutesWithDeployments::", "route", routes[routeIndex].Name)
 		for ruleIndex := range routes[routeIndex].Rules {
 			for backendIndex := range routes[routeIndex].Rules[ruleIndex].BackendRefs {
 
 				//currentRoute := &routes[routeIndex]
-                currentBackend := &routes[routeIndex].Rules[ruleIndex].BackendRefs[backendIndex]
+				currentBackend := &routes[routeIndex].Rules[ruleIndex].BackendRefs[backendIndex]
 
-				if (currentBackend.Namespace != "") {
-					namespace=currentBackend.Namespace
-				}else {
-					namespace="default"
+				if currentBackend.Namespace != "" {
+					namespace = currentBackend.Namespace
+				} else {
+					namespace = "default"
 				}
-				
 
 				slog.Info("::FillRoutesWithDeployment:: Looking for service", "service", currentBackend.ServiceName, "namespace", namespace)
 				svc, err := c.GetService(ctx, currentBackend.ServiceName, namespace)
@@ -401,39 +399,39 @@ func (c *Client) FillRoutesWithDeployments(ctx context.Context, routes []RouteIn
 				deployment, err := c.GetDeploymentBySelector(ctx, namespace, svc.Selector)
 				if err != nil {
 					slog.Error("::FillRoutesWithDeployment:: GetDeploymentBySelector", "ERROR", err)
-					return  err
+					return err
 				}
 				slog.Info("::FillRoutesWithDeployments::", "deployment", deployment.Image)
-				
+
 				currentBackend.Deployments = append(currentBackend.Deployments, *deployment)
 			}
 		}
 	}
-/*
-	for _, httpRoute := range routes.Items {
-		for _, rule := range httpRoute.Spec.Rules {
-			for _, backend := range rule.BackendRefs {
-				fmt.Printf("%s service \n", backend.Name)
-				if (*backend.Namespace != "") {
-					namespace = *backend.Namespace
-				}else {
-					namespace = "default"
-				} 
-				//var svc ServiceInfo
-				//var deployment DeploymentInfo
-				
-				svc, err := c.GetService(ctx, backend.Name, namespace)
-				if err != nil {
-					return err
+	/*
+		for _, httpRoute := range routes.Items {
+			for _, rule := range httpRoute.Spec.Rules {
+				for _, backend := range rule.BackendRefs {
+					fmt.Printf("%s service \n", backend.Name)
+					if (*backend.Namespace != "") {
+						namespace = *backend.Namespace
+					}else {
+						namespace = "default"
+					}
+					//var svc ServiceInfo
+					//var deployment DeploymentInfo
+
+					svc, err := c.GetService(ctx, backend.Name, namespace)
+					if err != nil {
+						return err
+					}
+					deployment, err := c.GetDeploymentBySelector(ctx, namespace, svc.Selector)
+					if err != nil {
+						return  err
+					}
+					backend.Deployments[0] = toDeploymentInfo(deployment)
 				}
-				deployment, err := c.GetDeploymentBySelector(ctx, namespace, svc.Selector)
-				if err != nil {
-					return  err
-				}
-				backend.Deployments[0] = toDeploymentInfo(deployment)
 			}
 		}
-	}
-*/
-	return nil	
+	*/
+	return nil
 }
