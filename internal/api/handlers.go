@@ -43,11 +43,15 @@ func (d Deps) health() http.HandlerFunc {
 
 // Register mounts all routes on mux (caller wraps /api prefix outside or inside).
 func Register(mux chi.Router, d Deps) {
-	mux.Get("/", d.hello())
+	
 	mux.Get("/health", d.health())
 
 	mux.Route("/route", func(r chi.Router) {
 		r.Get("/", d.HandleListRoutes(d.K8sClient))
+	})
+
+	mux.Route("/getRoute", func(r chi.Router) {
+		r.Get("/", d.HandleGetRoute(d.K8sClient))
 	})
 
 }

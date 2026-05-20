@@ -14,7 +14,7 @@ const (
 	gatewayResource = "httproutes"
 )
 
-func HandleGetRoute(k8sClient *k8s.Client) http.HandlerFunc {
+func (d Deps) HandleGetRoute(k8sClient *k8s.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		path := req.URL.Path
 		routeName, svcName, ok := parseRoutePath(path)
