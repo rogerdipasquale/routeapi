@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/go-chi/chi/v5"
-
 	"routeapi/internal/k8s"
 )
 
@@ -18,8 +16,8 @@ const (
 
 func (d Deps) HandleGetRoute(k8sClient *k8s.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
-		routeName := chi.URLParam(req, "routeName")
-		namespace := chi.URLParam(req, "namespace")
+		routeName := req.PathValue("routeName")
+		namespace := req.PathValue("namespace")
 		labelSelector := req.URL.Query().Get("labelSelector")
 		labelSelectorParam := ""
 		// includeDeployment := req.URL.Query().Get("include_deployment")
@@ -68,17 +66,18 @@ func (d Deps) HandleGetRoute(k8sClient *k8s.Client) http.HandlerFunc {
 
 func (d Deps) ValidateLabelSelector(labelSelector string) bool {
 	validLabelSelector := true
+	d.Log.Debug("::ValidateLabelSelector::", "input", labelSelector)
 	if labelSelector != "" {
 		lowerLS := strings.ToLower(labelSelector)
-		selectorArr := strings.Split(lowerLS, "%3d")
+		selectorArr := strings.Split(lowerLS, ",")
 		if len(selectorArr) > 0 {
 			for i := 0; i < len(selectorArr); i++ {
-				keyVal := strings.Split(selectorArr[i], "%2c")
+				keyVal := strings.Split(selectorArr[i], "=")
 				validLabelSelector = validLabelSelector && len(keyVal) == 2
-				d.Log.Debug("label selector: %s=%s", keyVal[0], keyVal[1])
+				d.Log.Debug("label selector: %s", keyVal[0])
 			}
 		} else {
-			d.Log.Warn("Label selector is wrong, ommitting it:", labelSelector)
+			d.Log.Warn("Label selector is wrong, ommitting it", "error", labelSelector)
 		}
 	}
 	return validLabelSelector

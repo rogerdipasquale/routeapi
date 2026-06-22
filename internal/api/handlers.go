@@ -53,7 +53,7 @@ func Register(mux chi.Router, d Deps) {
 	})
 
 	// will return a single route by namespace and routeName
-	mux.Route("/route)", func(r chi.Router) {
+	mux.Route("/route", func(r chi.Router) {
 		r.Get("/{namespace}/{routeName}", d.HandleGetRoute(d.K8sClient))
 	})
 

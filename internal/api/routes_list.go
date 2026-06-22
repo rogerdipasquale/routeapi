@@ -9,22 +9,22 @@ import (
 )
 
 /*
-returns a list of routes matching criteria:
+Returns a list of Gateway API HttpRoutes matching criteria:
   - namespace
-  - label + value
-    will return deployment data if requested by "include_deployment" parameter
+  - label_selector
+  - include_deployment
 */
 func (d Deps) HandleListRoutes(k8sClient *k8s.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		namespace := req.URL.Query().Get("namespace")
 		queriesDeployment := req.URL.Query().Get("include_deployment")
-		labelSelector := req.URL.Query().Get("labelSelector")
+		labelSelector := req.URL.Query().Get("label_selector")
 		labelSelectorParam := ""
 
 		if d.ValidateLabelSelector(labelSelector) {
 			labelSelectorParam = labelSelector
 		}
-
+		d.Log.Debug("::HandleListRoutes", "labelSelectorParam", labelSelectorParam)
 		routes, err := k8sClient.ListHTTPRoutes(req.Context(), namespace, labelSelectorParam)
 		if err != nil {
 			writeError(w, http.StatusInternalServerError, err.Error())
@@ -32,7 +32,7 @@ func (d Deps) HandleListRoutes(k8sClient *k8s.Client) http.HandlerFunc {
 			return
 		}
 
-		slog.Info("::HandleListRoutes:: queryesDeployment", "queriesDeployment", queriesDeployment)
+		d.Log.Debug("::HandleListRoutes:: queryesDeployment", "queriesDeployment", queriesDeployment)
 		if queriesDeployment == "true" {
 
 			err = k8sClient.FillRoutesWithDeployments(req.Context(), routes)

@@ -271,7 +271,7 @@ func (c *Client) ListHTTPRoutes(ctx context.Context, namespace string, labelSele
 	}
 	url := fmt.Sprintf("%s/apis/%s/%s/namespaces/%s/%s%s",
 		c.baseURL, GatewayAPIGroup, GatewayAPIVersion, namespace, HTTPRouteResource, labelSelectorString)
-
+	slog.Debug("::ListHTTPRoutes::", "url", url)
 	data, statusCode, err := c.doRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
