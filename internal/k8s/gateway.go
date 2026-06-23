@@ -232,9 +232,13 @@ type ListMetadata struct {
 	RemainingItemCount *int64 `json:"remainingItemCount,omitempty"`
 }
 
-func (c *Client) GetHTTPRoute(ctx context.Context, name, namespace string) (*RouteInfo, error) {
-	url := fmt.Sprintf("%s/apis/%s/%s/namespaces/%s/%s/%s",
-		c.baseURL, GatewayAPIGroup, GatewayAPIVersion, namespace, HTTPRouteResource, name)
+func (c *Client) GetHTTPRoute(ctx context.Context, name, namespace string, label string) (*RouteInfo, error) {
+	labelSelectorString := ""
+	if label != "" {
+		labelSelectorString = "?labelSelector=" + label
+	}
+	url := fmt.Sprintf("%s/apis/%s/%s/namespaces/%s/%s/%s%s",
+		c.baseURL, GatewayAPIGroup, GatewayAPIVersion, namespace, HTTPRouteResource, name, labelSelectorString)
 
 	data, statusCode, err := c.doRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -257,14 +261,17 @@ func (c *Client) GetHTTPRoute(ctx context.Context, name, namespace string) (*Rou
 	return toRouteInfo(&route), nil
 }
 
-func (c *Client) ListHTTPRoutes(ctx context.Context, namespace string) ([]RouteInfo, error) {
+func (c *Client) ListHTTPRoutes(ctx context.Context, namespace string, labelSelector string) ([]RouteInfo, error) {
 	if namespace == "" {
 		namespace = c.namespace
 	}
-
-	url := fmt.Sprintf("%s/apis/%s/%s/namespaces/%s/%s",
-		c.baseURL, GatewayAPIGroup, GatewayAPIVersion, namespace, HTTPRouteResource)
-
+	labelSelectorString := ""
+	if labelSelector != "" {
+		labelSelectorString = "?labelSelector=" + labelSelector
+	}
+	url := fmt.Sprintf("%s/apis/%s/%s/namespaces/%s/%s%s",
+		c.baseURL, GatewayAPIGroup, GatewayAPIVersion, namespace, HTTPRouteResource, labelSelectorString)
+	slog.Debug("::ListHTTPRoutes::", "url", url)
 	data, statusCode, err := c.doRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -289,7 +296,7 @@ func (c *Client) ListHTTPRoutes(ctx context.Context, namespace string) ([]RouteI
 }
 
 func (c *Client) GetRouteWithService(ctx context.Context, routeName, routeNamespace, svcName, svcNamespace string) (*RouteInfo, *ServiceInfo, *DeploymentInfo, error) {
-	route, err := c.GetHTTPRoute(ctx, routeName, routeNamespace)
+	route, err := c.GetHTTPRoute(ctx, routeName, routeNamespace, "")
 	if err != nil {
 		return nil, nil, nil, err
 	}
