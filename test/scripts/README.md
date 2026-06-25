@@ -13,12 +13,12 @@ kind create cluster
 ```
 ### Install traefik and API gateway routes
 
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
+
 
 helm repo add traefik https://traefik.github.io/charts
-helm update
-helm install traefik traefik/traefik -f values.yaml -n traefik --create-namespace --version 37.3.0
-
+helm repo update
+helm install traefik traefik/traefik -f traefik-values.yaml -n traefik --create-namespace --version 37.3.0
+-- not needed: kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
 ### Install assets
 Assets are taken from:
 https://github.com/rogerdipasquale/k8s-gateway/tree/main/traefik/application
@@ -36,9 +36,30 @@ kubectl apply -f routes.yaml
 kubectl apply -f ../../manifests/rbac.yaml
 ```
 
+### Prepare certs for the application 
+
+ Download Cert and token from an existing pod:
+```shell
+sudo mkdir /var/run/secrets/kubernetes.io/serviceaccount/ -p
+sudo chwon codespace /var/run/secrets/kubernetes.io/serviceaccount/
+
+kubectl cp traefik-7ddc96d-28flq:/var/run/secrets/kubernetes.io/serviceaccount/..data/ca.crt ./ca.crt -n traefik
+
+kubectl cp traefik-7ddc96d-28flq:/var/run/secrets/kubernetes.io/serviceaccount/..data/token ./token
+
+cp * /var/run/secrets/kubernetes.io/serviceaccount/
+```
 ### Run the application (in background mode)
 
-go run cmd/server/main.go &
+
+```shell
+go build cmd/server/main.go 
+export KUBERNETES_SERVICE_PORT=$(docker port kind-control-plane|sed -e "s/.*://")
+export KUBERNETES_SERVICE_HOST=127.0.0.1
+export PORT=8080
+./main &
+```
+
 
 ### Test 
 
