@@ -1,0 +1,32 @@
+apiVersion: gateway.networking.k8s.io/v1 # https://kubernetes.io/docs/concepts/services-networking/gateway/#api-kind-gateway
+kind: Gateway
+metadata:
+  name: weight-gateway
+  namespace: traefik
+spec:
+  gatewayClassName: traefik # This should exists https://gateway-api.sigs.k8s.io/api-types/gatewayclass/
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 8000
+---
+apiVersion: gateway.networking.k8s.io/v1 # https://kubernetes.io/docs/concepts/services-networking/gateway/#api-kind-httproute
+kind: HTTPRoute
+metadata:
+  name: weight-route
+  namespace: traefik
+spec:
+  parentRefs:
+  - name: weight-gateway # Reference to gateway
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /standard
+    backendRefs:
+    - name: whoami
+      port: 80
+      weight: 1
+    - name: whoami-api
+      port: 80
+      weight: 3
