@@ -7,6 +7,7 @@ RUN go mod download
 
 COPY . .
 
+RUN apk --no-cache add make
 RUN make docs-install \ 
     && make docs
 RUN make build
