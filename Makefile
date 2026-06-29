@@ -7,7 +7,7 @@ tidy:
 	$(GO) mod tidy
 
 build: test
-	$(GO) build -o ./app ./cmd/server
+	$(GO) build -o ./routeapi ./cmd/server
 
 run:
 	$(GO) run ./cmd/server
@@ -60,4 +60,4 @@ test:
 	$(GO) test ./...
 
 clean:
-	rm -rf bin
+	rm ./routeapi
