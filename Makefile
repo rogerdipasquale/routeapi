@@ -1,4 +1,4 @@
-.PHONY: tidy build-all run server cron docs docs-install verify-openapi verify-openapi-install fmt vet test clean build
+.PHONY: tidy run docs docs-install verify-openapi verify-openapi-install fmt vet test clean build
 
 GO          ?= go
 SWAG        ?= $(shell command -v swag 2>/dev/null)
@@ -6,13 +6,10 @@ SWAG        ?= $(shell command -v swag 2>/dev/null)
 tidy:
 	$(GO) mod tidy
 
-build-all: 
-	$(GO) build -o ./main ./cmd/server/main.go
-
 build: test
 	$(GO) build -o ./app ./cmd/server
 
-run server:
+run:
 	$(GO) run ./cmd/server
 
 # Install the swag CLI matching the version pinned in go.mod / tools.go.
