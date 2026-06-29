@@ -1,0 +1,84 @@
+components: {}
+externalDocs:
+  description: ""
+  url: ""
+info:
+  description: API to query HTTPRoutes and related Gateway API resources.
+  license:
+    name: MIT
+    url: https://opensource.org
+  title: RouteAPI
+  version: 0.0.1
+openapi: 3.1.0
+paths:
+  /route/{namespace}/{routeName}:
+    get:
+      description: Returns details for an API HttpRoute
+      parameters:
+      - description: Namespace to search
+        in: path
+        name: namespace
+        required: true
+        schema:
+          type: string
+      - description: HTTPRoute resource name being searched
+        in: path
+        name: routeName
+        required: true
+        schema:
+          type: string
+      - description: decides if it adds Deployment data related to the route
+        in: query
+        name: include_deployment
+        schema:
+          type: boolean
+      - description: Applies a label selector to k8s API query in format label_name=value,label_name2,value2
+        in: query
+        name: label_selectoor
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: OK
+      summary: Gets HTTPRoute object
+      tags:
+      - HTTPRoute
+  /routes:
+    get:
+      description: Returns a list of Gateway API HttpRoutes matching criteria
+      parameters:
+      - description: Namespace to search (default)
+        in: query
+        name: namespace
+        schema:
+          type: string
+      - description: decides if it adds Deployment data related to the route
+        in: query
+        name: include_deployment
+        schema:
+          type: boolean
+      - description: Applies a label selector to k8s API query in format label_name=value,label_name2,value2
+        in: query
+        name: label_selector
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: OK
+      summary: List HTTPRoute objects
+      tags:
+      - HTTPRoute
+servers:
+- url: /api

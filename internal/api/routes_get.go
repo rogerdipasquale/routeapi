@@ -14,6 +14,18 @@ const (
 	gatewayResource = "httproutes"
 )
 
+// HandleGetRoute returns details of Gateway API HttpRoutes.
+//
+//	@Summary		Gets HTTPRoute object
+//	@Description	Returns details for an API HttpRoute
+//	@Tags			HTTPRoute
+//	@Produce		json
+//	@Success		200	{array}	string
+//	@Router			/route/{namespace}/{routeName} [get]
+//	@param			namespace			path	string	true	"Namespace to search"
+//	@param			routeName			path	string	true	"HTTPRoute resource name being searched"
+//	@param			include_deployment	query	boolean	false	"decides if it adds Deployment data related to the route"
+//	@param			label_selectoor		query	string	false	"Applies a label selector to k8s API query in format label_name=value,label_name2,value2"
 func (d Deps) HandleGetRoute(k8sClient *k8s.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		routeName := req.PathValue("routeName")
@@ -74,7 +86,7 @@ func (d Deps) ValidateLabelSelector(labelSelector string) bool {
 			for i := 0; i < len(selectorArr); i++ {
 				keyVal := strings.Split(selectorArr[i], "=")
 				validLabelSelector = validLabelSelector && len(keyVal) == 2
-				d.Log.Debug("label selector: %s", keyVal[0])
+				d.Log.Debug("label selector: %s", keyVal[0], keyVal[1])
 			}
 		} else {
 			d.Log.Warn("Label selector is wrong, ommitting it", "error", labelSelector)

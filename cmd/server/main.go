@@ -12,11 +12,20 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	"routeapi/docs"
 	"routeapi/internal/api"
 	"routeapi/internal/config"
 	"routeapi/internal/k8s"
 )
 
+// @title			RouteAPI
+// @version		0.0.1
+// @description	API to query HTTPRoutes and related Gateway API resources.
+// @license.name    MIT
+// @license.url     https://opensource.org
+// @BasePath		/api
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -40,6 +49,7 @@ func main() {
 		Log:       log,
 		K8sClient: k8sClient,
 	}
+	docs.SwaggerInfo.BasePath = "/api"
 
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
@@ -47,12 +57,7 @@ func main() {
 	router.Use(middleware.RealIP)
 	router.Use(middleware.Recoverer)
 	router.Use(api.CORSMiddleware(cfg))
-	/*	r.Get("/swagger", func(w http.ResponseWriter, req *http.Request) {
-			http.Redirect(w, req, "/swagger/index.html", http.StatusMovedPermanently)
-		})
-		r.Get("/swagger/*", httpSwagger.Handler(
-			httpSwagger.URL("/swagger/doc.json"),
-		))*/
+
 	router.Route("/api", func(apiRouter chi.Router) {
 		api.Register(apiRouter, deps)
 	})
@@ -63,6 +68,13 @@ func main() {
 		Handler:           router,
 		ReadHeaderTimeout: 10 * time.Second,
 	}
+
+	router.Get("/swagger", func(w http.ResponseWriter, req *http.Request) {
+		http.Redirect(w, req, "/swagger/index.html", http.StatusMovedPermanently)
+	})
+	router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("/swagger/doc.json"),
+	))
 
 	go func() {
 		slog.Info("listening", "addr", addr, "api", "http://127.0.0.1"+addr+"/api")
