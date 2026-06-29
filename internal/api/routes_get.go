@@ -22,8 +22,8 @@ const (
 //	@Produce		json
 //	@Success		200	{array}	string
 //	@Router			/route/{namespace}/{routeName} [get]
-//	@param			namespace			path	string	false	"Namespace to search"
-//	@param			routeName			path	string	false	"HTTPRoute resource name being searched"
+//	@param			namespace			path	string	true	"Namespace to search"
+//	@param			routeName			path	string	true	"HTTPRoute resource name being searched"
 //	@param			include_deployment	query	boolean	false	"decides if it adds Deployment data related to the route"
 //	@param			label_selectoor		query	string	false	"Applies a label selector to k8s API query in format label_name=value,label_name2,value2"
 func (d Deps) HandleGetRoute(k8sClient *k8s.Client) http.HandlerFunc {

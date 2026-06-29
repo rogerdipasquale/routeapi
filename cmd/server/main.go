@@ -23,7 +23,8 @@ import (
 // @title			RouteAPI
 // @version		0.0.1
 // @description	API to query HTTPRoutes and related Gateway API resources.
-// @license.name	MIT
+// @license.name    MIT
+// @license.url     https://opensource.org
 // @BasePath		/api
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
