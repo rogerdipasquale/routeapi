@@ -38,6 +38,6 @@ jobs:
         run: |
           kubectl apply -f test/scripts/applications.yaml
           kubectl apply -f test/scripts/routes.yaml
-          kubectl port-forward svc/routeapi 8080:8080 &
+          kubectl port-forward svc/routeapi 8080:80 &
           curl "http://127.0.0.1:8080/api/routes?namespace=traefik"
           curl "http://127.0.0.1:8080/api/route/traefik/weight-route"|jq
