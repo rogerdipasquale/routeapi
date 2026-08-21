@@ -34,6 +34,8 @@ jobs:
           kubectl apply -f manifests/rbac.yaml
           # sed -i -e "s/image\:.*$/image:\ routeapi:test/" manifests/deployment.yaml 
           kubectl apply -f manifests/deployment.yaml
+          kubectl wait deployment/routeapi --for=condition=ready --timeout=2m
+          kubectl describe pod -l app=routeapi
       
       - name: Install sample app and routes
         run: |
