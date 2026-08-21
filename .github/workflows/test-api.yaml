@@ -34,15 +34,20 @@ jobs:
           kubectl apply -f manifests/rbac.yaml
           kubectl get nodes
           # sed -i -e "s/image\:.*$/image:\ routeapi:test/" manifests/deployment.yaml 
+          
           kubectl apply -f manifests/deployment.yaml
-          kubectl wait deployment/routeapi --for=condition=ready --timeout=2m
           kubectl describe pod -l app=routeapi
+          sleep 50
+          kubectl describe pod -l app=routeapi
+          kubectl wait deployment/routeapi --for=condition=ready --timeout=2m
+          
       
       - name: Install sample app and routes
         run: |
           kubectl apply -f test/scripts/applications.yaml
           kubectl apply -f test/scripts/routes.yaml
           kubectl describe deployment routeapi
+          
           kubectl get pod -o yaml
           kubectl logs deployment/routeapi
           kubectl port-forward svc/routeapi 8080:80 &
