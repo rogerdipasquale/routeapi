@@ -37,7 +37,7 @@ jobs:
           
           kubectl apply -f manifests/deployment.yaml
           kubectl describe pod -l app=routeapi
-          sleep 50
+          sleep 120
           kubectl describe pod -l app=routeapi
           kubectl wait deployment/routeapi --for=condition=ready --timeout=2m
           
