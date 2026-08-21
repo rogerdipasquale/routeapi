@@ -15,6 +15,7 @@ jobs:
         uses: helm/kind-action@v1.14.0
         with:
           cluster_name: routeapi-cluster
+          registry: true
 
 # installs traefik to implement API Gateway routing
       - name: Install traefik
