@@ -13,7 +13,7 @@ run server:
 
 # Install the swag CLI matching the version pinned in go.mod / tools.go.
 docs-install:
-	$(GO) install github.com/swaggo/swag/cmd/swag
+	$(GO) install github.com/swaggo/swag/v2/cmd/swag@latest
 
 # Regenerate docs/docs.go, docs/swagger.json, docs/swagger.yaml from the
 # annotations on cmd/server/main.go and the handlers in internal/httpserver.
@@ -26,7 +26,8 @@ docs:
 	  --generalInfo cmd/server/main.go \
 	  --output docs \
 	  --parseDependency \
-	  --parseInternal
+	  --parseInternal \
+	  --v3.1
 
 fmt:
 	$(GO) fmt ./...
