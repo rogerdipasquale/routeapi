@@ -37,9 +37,8 @@ jobs:
           
           kubectl apply -f manifests/deployment.yaml
           kubectl describe pod -l app=routeapi
-          sleep 120
+          kubectl wait pod -l app=routeapi --for=condition=ready --timeout=15s
           kubectl describe pod -l app=routeapi
-          kubectl wait deployment/routeapi --for=condition=ready --timeout=2m
           
       
       - name: Install sample app and routes
