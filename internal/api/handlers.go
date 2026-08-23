@@ -30,6 +30,14 @@ func (d Deps) hello() http.HandlerFunc {
 	}
 }
 
+// health godoc
+// @Summary Health status
+// @Description health status
+// @Produce json
+// @Success 201 {object} APIResponse
+// @Failure 400 {object} APIResponse
+// @Failure 500 {object} APIResponse
+// @Router /health/ [get]
 func (d Deps) health() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, map[string]any{

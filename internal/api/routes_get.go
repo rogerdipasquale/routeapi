@@ -14,6 +14,17 @@ const (
 	gatewayResource = "httproutes"
 )
 
+// HandleGetRoute godoc
+// @Summary Retrieves details of a specific route
+// @Description Queries API Gateway HTTP Route object
+// @Accept json
+// @Produce json
+// @Param namespace path string true "Namespace to search for params"
+// @Param routeName path string false "Label string to match selector: comma separated values of type key=value"
+// @Success 201 {object} APIResponse
+// @Failure 400 {object} APIResponse
+// @Failure 500 {object} APIResponse
+// @Router /route/{namespace}/{routeName} [get]
 func (d Deps) HandleGetRoute(k8sClient *k8s.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		routeName := req.PathValue("routeName")
