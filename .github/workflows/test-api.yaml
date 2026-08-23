@@ -33,14 +33,35 @@ jobs:
         run: |
           kubectl apply -f manifests/rbac.yaml
           kubectl get nodes
-          # sed -i -e "s/image\:.*$/image:\ routeapi:test/" manifests/deployment.yaml 
+          sed -i -e "s/image\:.*$/image:\ routeapi:test/" manifests/deployment.yaml 
           
           kubectl apply -f manifests/deployment.yaml
           kubectl describe pod -l app=routeapi
           kubectl wait pod -l app=routeapi --for=condition=ready --timeout=15s
           kubectl describe pod -l app=routeapi
           
-      
+      - name: Start Port-Forward
+        run: |
+          # Run port-forward in the background and redirect stdout/stderr
+          kubectl port-forward svc/routeapi 8080:80 > pf.log 2>&1 &
+          
+          # Save the process ID (PID) if you need to kill it explicitly later
+          echo "PF_PID=$!" >> $GITHUB_ENV
+          
+          # Health check loop: Wait up to 30 seconds for localhost:8080 to become responsive
+          echo "Waiting for port-forward to establish..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8080 > /dev/null; then
+              echo "Port-forward is ready!"
+              exit 0
+            fi
+            sleep 1
+          done
+          
+          echo "Error: Port-forward failed to become ready"
+          cat pf.log
+          exit 1
+
       - name: Install sample app and routes
         run: |
           kubectl apply -f test/scripts/applications.yaml
@@ -49,6 +70,6 @@ jobs:
           
           kubectl get pod -o yaml
           kubectl logs deployment/routeapi
-          kubectl port-forward svc/routeapi 8080:80 &
+          # kubectl port-forward svc/routeapi 8080:80 &
           curl "http://127.0.0.1:8080/api/routes?namespace=traefik"
           curl "http://127.0.0.1:8080/api/route/traefik/weight-route"|jq
