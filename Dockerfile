@@ -7,9 +7,8 @@ RUN go mod download
 
 COPY . .
 
-RUN apk --no-cache add make
-RUN make docs-install \ 
-    && make docs
+RUN apk add --no-cache make
+RUN make docs-install && make docs
 RUN make build
 
 FROM alpine:3.19
@@ -19,9 +18,7 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /opt/app
 
 COPY --from=builder /app/routeapi .
-COPY --from=builder /app/docs/ ./
-COPY web/ ./web/
-
+COPY --from=builder /app/web/ ./web/
 EXPOSE 8080
 
 CMD ["./routeapi"]

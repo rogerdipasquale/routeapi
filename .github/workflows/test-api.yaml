@@ -1,0 +1,70 @@
+name: Test routeAPI by installing it in a kind cluster
+on:
+  push:
+    branches:
+      - test/*
+      - testing/*
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+# installs kind cluster
+      - name: Setup Kubernetes
+        uses: helm/kind-action@v1.14.0
+        with:
+          cluster_name: routeapi-cluster
+          registry: true
+
+# installs traefik to implement API Gateway routing
+      - name: Install traefik
+        run: |
+          helm repo add traefik https://traefik.github.io/charts
+          helm repo update
+          helm install traefik traefik/traefik -f test/scripts/traefik-values.yaml -n traefik --create-namespace --version 37.3.0
+# installs applications
+      - name: Build application and load image into kind cluster
+        run: |
+          docker build -t routeapi:test .
+          kind load docker-image routeapi:test --name routeapi-cluster
+      
+      - name: Install app in cluster
+        run: |
+          kubectl apply -f manifests/rbac.yaml
+          echo "Displaying nodes" && kubectl get nodes
+          sed -i -e "s/image\:.*$/image:\ routeapi:test/" manifests/deployment.yaml           
+          kubectl apply -f manifests/deployment.yaml
+          kubectl wait pod -l app=routeapi --for=condition=ready --timeout=15s
+          kubectl describe pod -l app=routeapi
+# port Forwards service to run tests          
+      - name: Start Port-Forward
+        run: |
+          # Run port-forward in the background and redirect stdout/stderr
+          kubectl port-forward svc/routeapi 8080:80 > pf.log 2>&1 &
+          
+          # Save the process ID (PID) if you need to kill it explicitly later
+          echo "PF_PID=$!" >> $GITHUB_ENV
+          
+          # Health check loop: Wait up to 30 seconds for localhost:8080 to become responsive
+          echo "Waiting for port-forward to establish..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8080 > /dev/null; then
+              echo "Port-forward is ready!"
+              exit 0
+            fi
+            sleep 1
+          done
+          
+          echo "Error: Port-forward failed to become ready"
+          cat pf.log
+          exit 1
+# tests
+      - name: Install sample app and routes
+        run: |
+          kubectl apply -f test/scripts/applications.yaml
+          kubectl apply -f test/scripts/routes.yaml
+
+          curl "http://127.0.0.1:8080/api/routes?namespace=traefik"
+          curl "http://127.0.0.1:8080/api/route/traefik/weight-route"|jq

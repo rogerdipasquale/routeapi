@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	httpSwagger "github.com/swaggo/http-swagger"
 
 	httpSwagger "github.com/swaggo/http-swagger"
 
@@ -18,14 +19,17 @@ import (
 	"routeapi/internal/api"
 	"routeapi/internal/config"
 	"routeapi/internal/k8s"
+
+	_ "routeapi/docs"
 )
 
-// @title			RouteAPI
-// @version		0.0.1
-// @description	API to query HTTPRoutes and related Gateway API resources.
-// @license.name    MIT
-// @license.url     https://opensource.org
+// @title	routeapi
+// @version		0.0.2
+// @description	Exposes API Gateway routes and deployments attached to them
 // @BasePath		/api
+// @schemes		http https
+// @accept			json
+// @produce		json
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -58,6 +62,12 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(api.CORSMiddleware(cfg))
 
+	router.Get("/swagger", func(w http.ResponseWriter, req *http.Request) {
+		http.Redirect(w, req, "/swagger/index.html", http.StatusMovedPermanently)
+	})
+	router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("/swagger/doc.json"),
+	))
 	router.Route("/api", func(apiRouter chi.Router) {
 		api.Register(apiRouter, deps)
 	})

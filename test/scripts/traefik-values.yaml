@@ -1,0 +1,5 @@
+providers:
+  kubernetesGateway:
+    enabled: true
+    controllerName: "traefik.io/routeapi-main-controller"
+    labelselector: "app.kubernetes.io/instance=traefik-traefik"

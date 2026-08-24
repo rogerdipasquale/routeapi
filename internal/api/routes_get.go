@@ -14,18 +14,17 @@ const (
 	gatewayResource = "httproutes"
 )
 
-// HandleGetRoute returns details of Gateway API HttpRoutes.
-//
-//	@Summary		Gets HTTPRoute object
-//	@Description	Returns details for an API HttpRoute
-//	@Tags			HTTPRoute
-//	@Produce		json
-//	@Success		200	{array}	string
-//	@Router			/route/{namespace}/{routeName} [get]
-//	@param			namespace			path	string	true	"Namespace to search"
-//	@param			routeName			path	string	true	"HTTPRoute resource name being searched"
-//	@param			include_deployment	query	boolean	false	"decides if it adds Deployment data related to the route"
-//	@param			label_selectoor		query	string	false	"Applies a label selector to k8s API query in format label_name=value,label_name2,value2"
+// HandleGetRoute godoc
+// @Summary Retrieves details of a specific route
+// @Description Queries API Gateway HTTP Route object
+// @Accept json
+// @Produce json
+// @Param namespace path string true "Namespace to search for params"
+// @Param routeName path string false "Label string to match selector: comma separated values of type key=value"
+// @Success 201 {object} APIResponse
+// @Failure 400 {object} APIResponse
+// @Failure 500 {object} APIResponse
+// @Router /route/{namespace}/{routeName} [get]
 func (d Deps) HandleGetRoute(k8sClient *k8s.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		routeName := req.PathValue("routeName")

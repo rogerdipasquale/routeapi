@@ -14,16 +14,18 @@ Returns a list of Gateway API HttpRoutes matching criteria:
   - label_selector
   - include_deployment
 */
-// HandleListRoutes returns a list of Gateway API HttpRoutes matching criteria.
-//	@Summary		List HTTPRoute objects
-//	@Description	Returns a list of Gateway API HttpRoutes matching criteria
-//	@Tags			HTTPRoute
-//	@Produce		json
-//	@Success		200					{array}	string
-//	@Router			/routes				[get]
-//	@param			namespace			query	string	false	"Namespace to search (default)"
-//	@param			include_deployment	query	boolean	false	"decides if it adds Deployment data related to the route"
-//	@param			label_selector		query	string	false	"Applies a label selector to k8s API query in format label_name=value,label_name2,value2"
+// HandleListRoutes godoc
+// @Summary Retrieves a list of routes matching criteria
+// @Description Queries API Gateway HTTP Route objects based on criteria
+// @Accept json
+// @Produce json
+// @Param namespace query string true "Namespace to search for params"
+// @Param label_selector query string false "Label string to match selector: comma separated values of type key=value"
+// @param include_deployment query boolean false "Flag to indicate if response should include deployment data for each route"
+// @Success 201 {object} APIResponse
+// @Failure 400 {object} APIResponse
+// @Failure 500 {object} APIResponse
+// @Router /routes/ [get]
 func (d Deps) HandleListRoutes(k8sClient *k8s.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		namespace := req.URL.Query().Get("namespace")
