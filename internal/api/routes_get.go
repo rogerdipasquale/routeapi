@@ -85,7 +85,7 @@ func (d Deps) ValidateLabelSelector(labelSelector string) bool {
 			for i := 0; i < len(selectorArr); i++ {
 				keyVal := strings.Split(selectorArr[i], "=")
 				validLabelSelector = validLabelSelector && len(keyVal) == 2
-				d.Log.Debug("label selector: %s", keyVal[0])
+				d.Log.Debug("label selector: %s", keyVal[0], keyVal[1])
 			}
 		} else {
 			d.Log.Warn("Label selector is wrong, ommitting it", "error", labelSelector)

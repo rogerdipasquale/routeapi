@@ -39,4 +39,4 @@ test:
 	$(GO) test ./...
 
 clean:
-	rm -rf bin
+	rm ./routeapi

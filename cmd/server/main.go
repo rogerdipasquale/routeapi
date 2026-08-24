@@ -13,6 +13,9 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	httpSwagger "github.com/swaggo/http-swagger"
 
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	"routeapi/docs"
 	"routeapi/internal/api"
 	"routeapi/internal/config"
 	"routeapi/internal/k8s"
@@ -50,6 +53,7 @@ func main() {
 		Log:       log,
 		K8sClient: k8sClient,
 	}
+	docs.SwaggerInfo.BasePath = "/api"
 
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
@@ -74,6 +78,13 @@ func main() {
 		Handler:           router,
 		ReadHeaderTimeout: 10 * time.Second,
 	}
+
+	router.Get("/swagger", func(w http.ResponseWriter, req *http.Request) {
+		http.Redirect(w, req, "/swagger/index.html", http.StatusMovedPermanently)
+	})
+	router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("/swagger/doc.json"),
+	))
 
 	go func() {
 		slog.Info("listening", "addr", addr, "api", "http://127.0.0.1"+addr+"/api")
