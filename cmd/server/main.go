@@ -21,7 +21,7 @@ import (
 )
 
 // @title	routeapi
-// @version		0.2
+// @version		0.0.2
 // @description	Exposes API Gateway routes and deployments attached to them
 // @BasePath		/api
 // @schemes		http https

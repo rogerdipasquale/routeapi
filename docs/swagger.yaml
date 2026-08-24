@@ -1,135 +1,115 @@
-components:
-  schemas:
-    internal_api.APIResponse:
-      properties:
-        data: {}
-        error: {}
-        message:
-          type: string
-        statusCode:
-          type: integer
-        success:
-          type: boolean
-      type: object
-externalDocs:
-  description: ""
-  url: ""
+basePath: /api
+consumes:
+- application/json
+definitions:
+  internal_api.APIResponse:
+    properties:
+      data: {}
+      error: {}
+      message:
+        type: string
+      statusCode:
+        type: integer
+      success:
+        type: boolean
+    type: object
 info:
+  contact: {}
   description: Exposes API Gateway routes and deployments attached to them
   title: routeapi
-  version: "0.2"
-openapi: 3.1.0
+  version: 0.0.2
 paths:
   /health/:
     get:
       description: health status
+      produces:
+      - application/json
       responses:
         "201":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/internal_api.APIResponse'
           description: Created
+          schema:
+            $ref: '#/definitions/internal_api.APIResponse'
         "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/internal_api.APIResponse'
           description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_api.APIResponse'
         "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/internal_api.APIResponse'
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_api.APIResponse'
       summary: Health status
   /route/{namespace}/{routeName}:
     get:
+      consumes:
+      - application/json
       description: Queries API Gateway HTTP Route object
       parameters:
       - description: Namespace to search for params
         in: path
         name: namespace
         required: true
-        schema:
-          type: string
+        type: string
       - description: 'Label string to match selector: comma separated values of type
           key=value'
         in: path
         name: routeName
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
+        type: string
+      produces:
+      - application/json
       responses:
         "201":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/internal_api.APIResponse'
           description: Created
+          schema:
+            $ref: '#/definitions/internal_api.APIResponse'
         "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/internal_api.APIResponse'
           description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_api.APIResponse'
         "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/internal_api.APIResponse'
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_api.APIResponse'
       summary: Retrieves details of a specific route
   /routes/:
     get:
+      consumes:
+      - application/json
       description: Queries API Gateway HTTP Route objects based on criteria
       parameters:
       - description: Namespace to search for params
         in: query
         name: namespace
         required: true
-        schema:
-          type: string
+        type: string
       - description: 'Label string to match selector: comma separated values of type
           key=value'
         in: query
         name: label_selector
-        schema:
-          type: string
+        type: string
       - description: Flag to indicate if response should include deployment data for
           each route
         in: query
         name: include_deployment
-        schema:
-          type: boolean
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
+        type: boolean
+      produces:
+      - application/json
       responses:
         "201":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/internal_api.APIResponse'
           description: Created
+          schema:
+            $ref: '#/definitions/internal_api.APIResponse'
         "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/internal_api.APIResponse'
           description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_api.APIResponse'
         "500":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/internal_api.APIResponse'
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_api.APIResponse'
       summary: Retrieves a list of routes matching criteria
-servers:
-- url: /api
+produces:
+- application/json
+schemes:
+- http
+- https
+swagger: "2.0"
